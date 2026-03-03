@@ -50,7 +50,7 @@ print_color "yellow" "Starting optimization process. Please do not interrupt."
 sleep 3
 
 # --- Section 1: Network & Hotspot Enhancement ---
-print_color "yellow" "\n[+] Optimizing Network Stack..."
+print_color "yellow" "\n[+] Optimizing Network Stack & Hotspot Speed..."
 sleep 1
 
 # Reset network connections by toggling Wi-Fi to clear caches.
@@ -69,11 +69,18 @@ adb shell settings put global private_dns_specifier 1dot1dot1dot1.cloudflare-dns
 echo "  -> Disabling background Wi-Fi scanning..."
 adb shell settings put global wifi_scan_always_enabled 0
 
-# Improve hotspot connection stability
-echo "  -> Stabilizing Wi-Fi Hotspot..."
+# Improve hotspot connection stability and speed
+echo "  -> Optimizing Wi-Fi Hotspot performance..."
 adb shell settings put global tether_offload_disabled 0
+adb shell settings put global tether_dun_required 0
+adb shell settings put global mobile_data_always_on 1
 
-print_color "green" "[OK] Network stack optimized."
+# Disable Wi-Fi power saving to reduce latency (Ping)
+echo "  -> Disabling Wi-Fi power saving for maximum throughput..."
+adb shell settings put global wifi_power_save 0
+adb shell settings put global wifi_sleep_policy 2
+
+print_color "green" "[OK] Network and hotspot optimized."
 sleep 2
 
 # --- Section 2: UI & Graphics Performance ---
@@ -94,19 +101,25 @@ print_color "green" "[OK] UI and graphics performance enhanced."
 sleep 2
 
 # --- Section 3: System & Battery Optimization ---
-print_color "yellow" "\n[+] Optimizing System & Battery..."
+print_color "yellow" "\n[+] Optimizing System & Background Processes..."
 sleep 1
 
 # Reducing the logging buffer size can save memory and slightly reduce CPU overhead.
 echo "  -> Reducing logger buffer size to save resources..."
 adb shell settings put global logger_size 256k
 
+# Prevent system from throttling performance when acting as a hotspot
+echo "  -> Disabling power-related background throttling..."
+adb shell settings put global low_power_mode_trigger_level 0
+adb shell settings put global adaptive_battery_management_enabled 0
+adb shell settings put global app_standby_enabled 0
+
 # Recalibrate battery stats to ensure more accurate readings.
 echo "  -> Recalibrating battery statistics (unplug device after this)..."
 adb shell dumpsys battery unplug
 adb shell dumpsys battery reset
 
-print_color "green" "[OK] System and battery optimized."
+print_color "green" "[OK] System and background processes optimized."
 sleep 2
 
 # --- Finalization ---
